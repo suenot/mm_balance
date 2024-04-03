@@ -1,0 +1,10 @@
+[package]
+name = "mm_balance"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+actix-web = "4.5.1"
+juniper = "0.15.12"
+juniper_actix = "0.5.0"
+lazy_static = "1.4.0"
