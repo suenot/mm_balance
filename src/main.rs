@@ -4,14 +4,9 @@ use std::io;
 use dotenv::dotenv;
 use std::env;
 
-async fn get_balance(user_id: web::Path<String>) -> impl Responder {
+async fn get_mongodb_client() -> Client {
   // Load the .env file
   dotenv().ok();
-  // print name of function
-  println!("get_balance");
-  // print MONGODB_URL
-  println!("MONGODB_URL: {:?}", env::var("MONGODB_URL").expect("MONGODB_URL must be set"));
-  let user_id = user_id.into_inner();
 
   // Get the MongoDB connection string from the environment variable
   let mongodb_url = env::var("MONGODB_URL").expect("MONGODB_URL must be set");
@@ -23,12 +18,13 @@ async fn get_balance(user_id: web::Path<String>) -> impl Responder {
   client_options.app_name = Some("My App".to_string());
 
   // Get a handle to the deployment.
-  let client = Client::with_options(client_options).unwrap();
+  Client::with_options(client_options).unwrap()
+}
 
-  // Get a handle to a collection in the database.
-  // let collection = client.database("test").collection("users");
+async fn get_balance(user_id: web::Path<String>) -> impl Responder {
+  let user_id = user_id.into_inner();
+  let client = get_mongodb_client().await;
   let collection: mongodb::Collection<bson::document::Document> = client.database("test").collection("users");
-  println!("collection: {:?}", collection);
 
   // Query the database for a user with the provided id.
   let filter = doc! { "id": user_id.clone() };
